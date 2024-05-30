@@ -1,5 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Grid, Stack, Typography, Box } from "@mui/material";
+import Link from "next/link";
+import Header from "./components/app.header";
+import Footer from "./components/app.footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +15,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Header />
+
+        <Box component="main" sx={{ flexGrow: 1, padding: 3 }}>
+          {children}
+        </Box>
+        <Footer />
+      </body>
     </html>
   );
 }
