@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import styles from "./page.module.css";
-import { Grid, Typography } from "@mui/material";
+import { Grid, MenuItem, MenuList, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 function Home() {
   const [loading, setLoading] = useState(false);
@@ -21,26 +22,19 @@ function Home() {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      style={{ height: "100vh" }}
-    >
-      {loading ? (
-        <>
-          <Image
-            src="/vercel.svg"
-            alt="Vercel Logo"
-            width={72}
-            height={16}
-            className={styles.logo}
-          />
-          <Typography variant="h6" component="div" gutterBottom>
-            Welcome to Next.js!
+      style={{ height: "100vh" }}>
+      <MenuList>
+        <MenuItem>
+          <Typography variant="h4">
+            <Link href="/facebook">Facebook page</Link>
           </Typography>
-        </>
-      ) : (
-        <Typography variant="h6" component="div" gutterBottom>
-          Content loaded.
-        </Typography>
-      )}
+        </MenuItem>
+        <MenuItem>
+        <Typography variant="h4">
+            <Link href="/instagram">Instagram page</Link>
+          </Typography>
+        </MenuItem>
+      </MenuList>
     </Grid>
   );
 }
