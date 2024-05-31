@@ -4,6 +4,7 @@ import { Grid, Stack, Typography, Box } from "@mui/material";
 import Link from "next/link";
 import Header from "./components/app.header";
 import Footer from "./components/app.footer";
+import Sidebar from "./components/app.sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,15 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Header />
 
-        <Box component="main" sx={{ flexGrow: 1, padding: 3 }}>
-          {children}
+        <Box component="main" sx={{ flexGrow: 1, padding: 3 , direction:"row" }} >
+          <Grid container spacing={3}>
+            <Grid item xs={3}>
+              <Sidebar />
+            </Grid>
+            <Grid item xs={9}>
+              {children}
+            </Grid>
+          </Grid>
         </Box>
         <Footer />
       </body>
