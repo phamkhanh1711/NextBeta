@@ -59,7 +59,19 @@ function FoodProduct() {
 
   const handleDelete = (foodId) => {
     console.log(`Deleting food item with ID: ${foodId}`);
-    // Add your delete logic here
+    const deleteUrl = `http://localhost:4000/food/delete/${foodId}`
+    console.log(deleteUrl)
+    axios
+        .delete(deleteUrl)
+        .then((res) => {
+            console.log(res)
+            alert("Xóa Thức Ăn Thành Công")
+            setFoods(Foods.filter((food) => food.foodId !== foodId))
+           
+        })
+        .catch((error) => {
+            console.log(error)
+        })
     handleMenuClose();
   };
   const handleAdd = () => {
