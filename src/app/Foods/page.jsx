@@ -7,7 +7,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Pagination from "@mui/material/Pagination";
-import { Box, Grid, Stack, IconButton, Menu, MenuItem } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Stack,
+  IconButton,
+  Menu,
+  MenuItem,
+  TextField,
+} from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateIcon from "@mui/icons-material/Update";
@@ -15,6 +23,24 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import AddIcon from "@mui/icons-material/Add";
+import useSWR from "swr";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import AddFood from "./add/page";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 900,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  height: 400,
+  boxShadow: 24,
+  p: 4,
+};
 
 function FoodProduct() {
   const [loading, setLoading] = useState(false);
@@ -23,7 +49,10 @@ function FoodProduct() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedFoodId, setSelectedFoodId] = useState(null);
   const itemsPerPage = 3; // Number of items per page
+  const [open, setOpen] = useState(false);
 
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   useEffect(() => {
     setLoading(true);
     setTimeout(() => {
@@ -31,17 +60,20 @@ function FoodProduct() {
     }, 3000);
   }, []);
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:4000/food/all-Food")
-      .then((response) => {
-        console.log(response);
-        setGetData(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const fetcher = (url) => axios.get(url).then((res) => res.data);
+
+  const { data, error } = useSWR(
+    "http://localhost:4000/food/all-Food",
+    fetcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <div>Loading...</div>;
 
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
@@ -59,19 +91,18 @@ function FoodProduct() {
 
   const handleDelete = (foodId) => {
     console.log(`Deleting food item with ID: ${foodId}`);
-    const deleteUrl = `http://localhost:4000/food/delete/${foodId}`
-    console.log(deleteUrl)
+    const deleteUrl = `http://localhost:4000/food/delete/${foodId}`;
+    console.log(deleteUrl);
     axios
-        .delete(deleteUrl)
-        .then((res) => {
-            console.log(res)
-            alert("Xóa Thức Ăn Thành Công")
-            setFoods(Foods.filter((food) => food.foodId !== foodId))
-           
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+      .delete(deleteUrl)
+      .then((res) => {
+        console.log(res);
+        alert("Xóa Thức Ăn Thành Công");
+        setFoods(Foods.filter((food) => food.foodId !== foodId));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     handleMenuClose();
   };
   const handleAdd = () => {
@@ -87,7 +118,7 @@ function FoodProduct() {
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = getData.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <Grid
@@ -95,11 +126,17 @@ function FoodProduct() {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      style={{ height: "75vh" }}
-      ml={-17}>
-      <Stack direction="row" spacing={6}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      style={{ height: "75vh", width: "100%" }} // Thêm chiều rộng 100%
+    >
+      <Stack direction="row" spacing={6} style={{ width: "100%" }}>
+        {" "}
+        {/* Thêm chiều rộng 100% */}
+        <TableContainer component={Paper} style={{ width: "100%" }}>
+          {" "}
+          {/* Thêm chiều rộng 100% */}
+          <Table sx={{ width: "100%" }} aria-label="simple table">
+            {" "}
+            {/* Thêm chiều rộng 100% */}
             <TableHead>
               <TableRow>
                 <TableCell>foodId</TableCell>
@@ -147,21 +184,18 @@ function FoodProduct() {
                         <UpdateIcon />
                         Cập Nhật Thức Ăn
                       </MenuItem>
-                      <MenuItem onClick={handleAdd}>
-                        <AddIcon />
-                        Thêm Thức Ăn
-                      </MenuItem>
                     </Menu>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+            <AddFood />
           </Table>
         </TableContainer>
       </Stack>
       <Box sx={{ mt: 2 }}>
         <Pagination
-          count={Math.ceil(getData.length / itemsPerPage)}
+          count={Math.ceil(data.length / itemsPerPage)}
           page={currentPage}
           onChange={handlePageChange}
           color="primary"

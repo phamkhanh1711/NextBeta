@@ -7,6 +7,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { handleUploadFile } from "../../config/uploadImage";
+import { mutate } from "swr";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import AddIcon from "@mui/icons-material/Add";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 900,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  height: 400,
+  boxShadow: 24,
+  p: 4,
+};
 function AddFood() {
   const [Food, setFood] = useState({
     foodName: "",
@@ -15,6 +32,10 @@ function AddFood() {
   });
   const [errors, setErrors] = useState([]); // [foodName: 'Food Name cannot be empty', foodPrice: 'Food Price cannot be empty', foodImage: 'Image cannot be empty']
   const [fileName, setFileName] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const handleImageChange = (event) => {
     const imageFile = event.target.files[0];
     setFileName(imageFile.name);
@@ -84,6 +105,7 @@ function AddFood() {
         .then((response) => {
           console.log(response);
           alert("Add Food Success");
+          mutate("http://localhost:4000/food/all-Food");
           router.push("/Foods");
         })
         .catch((error) => {
@@ -93,64 +115,66 @@ function AddFood() {
   };
 
   return (
-    <Grid container spacing={2} p={4}>
-      <Grid item xs={12}>
-        <h1>Add Food</h1>
-      </Grid>
-      <Grid onSubmit={handleSubmit} item xs={12}>
-        <Grid container item xs={12} spacing={2} direction="row">
-          <Grid item xs={4}>
-            <TextField
-              id="outlined-basic"
-              label="Food Name"
-              variant="outlined"
-              name="foodName"
-              fullWidth
-              onChange={handleChange}
-            />
+    <>
+      <Button onClick={handleOpen}>
+        <AddIcon /> Thêm Thức Ăn{" "}
+      </Button>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description">
+        <Box sx={style}>
+          <Grid container spacing={2} p={4}>
+            <Grid item xs={12}>
+              <h1>Add Food</h1>
+            </Grid>
+            <Grid onSubmit={handleSubmit} item xs={12}>
+              <Grid container item xs={12} spacing={2} direction="row">
+                <Grid item xs={4}>
+                  <TextField
+                    id="outlined-basic"
+                    label="Food Name"
+                    variant="outlined"
+                    name="foodName"
+                    fullWidth
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <TextField
+                    id="outlined-basic"
+                    label="Food Price"
+                    variant="outlined"
+                    name="foodPrice"
+                    fullWidth
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <input
+                  accept="image/*"
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                  onChange={handleImageChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  type="submit"
+                  sx={{ width: 300, marginTop: "2%" }}>
+                  Add Food
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item xs={4}>
-            <TextField
-              id="outlined-basic"
-              label="Food Price"
-              variant="outlined"
-              name="foodPrice"
-              fullWidth
-              onChange={handleChange}
-            />
-          </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            type="file"
-            component="label"
-            sx={{ width: 150, marginTop: "2%" }}>
-            Upload File
-            <input
-              type="file"
-              name="foodImage"
-              hidden
-              onChange={handleImageChange}
-            />
-          </Button>
-          {fileName && (
-            <Typography variant="body1" sx={{ marginLeft: 2, marginTop: "2%" }}>
-              {fileName}
-            </Typography>
-          )}
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{ width: 300, marginTop: "2%" }}
-            onClick={handleSubmit}>
-            Add Food
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
+        </Box>
+      </Modal>
+    </>
   );
 }
 export default AddFood;
