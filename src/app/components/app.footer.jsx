@@ -5,7 +5,7 @@ function Footer()
     return(
         
         <footer>
-          <Box sx={{ paddingY: 2, backgroundColor: "grey.100" }}>
+          <Box sx={{ paddingY: 2, backgroundColor: "grey.400" }}>
             <Stack
               direction="row"
               spacing={6}
